@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/klimentru1986/go-event-booking/models"
@@ -11,7 +12,7 @@ func getEvents(ctx *gin.Context) {
 	events, err := models.GetAllEvents()
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Fail to load data"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
 
@@ -19,10 +20,10 @@ func getEvents(ctx *gin.Context) {
 }
 
 func getEventByID(ctx *gin.Context) {
-	_, event, err := findEventByParam(ctx.Param("id"))
+	_, event, err := findEventByStrId(ctx.Param("id"))
 
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Bad id"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
 		return
 	}
 
@@ -36,7 +37,7 @@ func createEvent(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&event)
 
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Fail to parse data"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
 		return
 	}
 
@@ -46,7 +47,7 @@ func createEvent(ctx *gin.Context) {
 	err = event.Create()
 
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Fail to save event"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
 		return
 	}
 
@@ -54,10 +55,10 @@ func createEvent(ctx *gin.Context) {
 }
 
 func updateEvent(ctx *gin.Context) {
-	id, _, err := findEventByParam(ctx.Param("id"))
+	id, _, err := findEventByStrId(ctx.Param("id"))
 
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Bad id"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
 		return
 	}
 
@@ -66,7 +67,7 @@ func updateEvent(ctx *gin.Context) {
 	err = ctx.ShouldBindJSON(&updatedEvent)
 
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Fail to parse data"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
 		return
 	}
 
@@ -75,27 +76,43 @@ func updateEvent(ctx *gin.Context) {
 	err = updatedEvent.Update()
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Fail to update data"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Event updated"})
+	ctx.JSON(http.StatusOK, updatedEvent)
 }
 
 func deleteEvent(ctx *gin.Context) {
-	_, event, err := findEventByParam(ctx.Param("id"))
+	_, event, err := findEventByStrId(ctx.Param("id"))
 
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Bad id"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
 		return
 	}
 
 	err = event.Delete()
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Could not delete"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "Deleted"})
+}
+
+func findEventByStrId(strId string) (*int64, *models.Event, error) {
+	id, err := strconv.ParseInt(strId, 10, 64)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	event, err := models.GetEventByID(id)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return &id, event, nil
 }

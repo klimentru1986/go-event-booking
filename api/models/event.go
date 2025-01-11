@@ -7,12 +7,12 @@ import (
 )
 
 type Event struct {
-	ID          int64
-	Name        string    `binding:"required"`
-	Description string    `binding:"required"`
-	Location    string    `binding:"required"`
-	DateTime    time.Time `binding:"required"`
-	UserID      int
+	ID          int64     `json:"id"`
+	Name        string    `json:"name" binding:"required" `
+	Description string    `json:"description" binding:"required" `
+	Location    string    `json:"location" binding:"required" `
+	DateTime    time.Time `json:"date_time" binding:"required" `
+	UserID      int       `json:"user_id"`
 }
 
 func (e *Event) Create() error {
@@ -34,11 +34,11 @@ func (e *Event) Create() error {
 		return err
 	}
 
-	id, _ := result.LastInsertId()
+	id, err := result.LastInsertId()
 
 	e.ID = id
 
-	return nil
+	return err
 }
 
 func (e *Event) Update() error {
