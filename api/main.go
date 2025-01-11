@@ -3,14 +3,14 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/klimentru1986/go-event-booking/db"
-	"github.com/klimentru1986/go-event-booking/rotes"
+	"github.com/klimentru1986/go-event-booking/routes"
 )
 
 func main() {
 	db.InitDB()
 	server := gin.Default()
 
-	rotes.SetupRoutes(server)
+	routes.SetupRoutes(server)
 
 	server.Run(":8080")
 }
