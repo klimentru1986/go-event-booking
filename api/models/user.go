@@ -1,6 +1,8 @@
 package models
 
 import (
+	"errors"
+
 	"github.com/klimentru1986/go-event-booking/db"
 	"github.com/klimentru1986/go-event-booking/utils"
 )
@@ -45,4 +47,25 @@ func (u *User) Create() error {
 
 	u.ID = userId
 	return err
+}
+
+func (u *User) ValidateCredentials() error {
+	query := "SELECT id, password FROM users WHERE email = ?"
+	row := db.DB.QueryRow(query, u.Email)
+
+	var id int64
+	var hashedPassword string
+	err := row.Scan(&id, &hashedPassword)
+	if err != nil {
+		return err
+	}
+
+	isValid := utils.ComparePassword(hashedPassword, u.Password)
+
+	if !isValid {
+		return errors.New("invalid password")
+	}
+
+	u.ID = id
+	return nil
 }

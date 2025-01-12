@@ -13,4 +13,5 @@ func SetupRoutes(server *gin.Engine) {
 	v1.DELETE("/events/:id", deleteEvent)
 
 	v1.POST("/signup", signup)
+	v1.POST("/login", login)
 }
