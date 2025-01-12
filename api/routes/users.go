@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/klimentru1986/go-event-booking/dto"
 	"github.com/klimentru1986/go-event-booking/models"
+	"github.com/klimentru1986/go-event-booking/utils"
 )
 
 func signup(ctx *gin.Context) {
@@ -47,5 +48,11 @@ func login(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, user)
+	jwt, err := utils.GenerateToken(user.ID, user.Email)
+
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"message": err})
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"token": jwt})
 }

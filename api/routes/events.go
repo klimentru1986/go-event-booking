@@ -41,8 +41,7 @@ func createEvent(ctx *gin.Context) {
 		return
 	}
 
-	// TODO change to real
-	event.UserID = 1
+	event.UserID = ctx.GetInt64("userId")
 
 	err = event.Create()
 
@@ -55,10 +54,16 @@ func createEvent(ctx *gin.Context) {
 }
 
 func updateEvent(ctx *gin.Context) {
-	id, _, err := findEventByStrId(ctx.Param("id"))
+	userId := ctx.GetInt64("userId")
+	id, event, err := findEventByStrId(ctx.Param("id"))
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
+		return
+	}
+
+	if userId != event.UserID {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		return
 	}
 
@@ -84,10 +89,16 @@ func updateEvent(ctx *gin.Context) {
 }
 
 func deleteEvent(ctx *gin.Context) {
+	userId := ctx.GetInt64("userId")
 	_, event, err := findEventByStrId(ctx.Param("id"))
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
+		return
+	}
+
+	if userId != event.UserID {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		return
 	}
 
@@ -115,4 +126,42 @@ func findEventByStrId(strId string) (*int64, *models.Event, error) {
 	}
 
 	return &id, event, nil
+}
+
+func registerForEvent(ctx *gin.Context) {
+	userId := ctx.GetInt64("userId")
+	_, event, err := findEventByStrId(ctx.Param("id"))
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
+		return
+	}
+
+	err = event.RegisterUser(userId)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{"message": "registered"})
+}
+
+func cancelRegistration(ctx *gin.Context) {
+	userId := ctx.GetInt64("userId")
+	_, event, err := findEventByStrId(ctx.Param("id"))
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
+		return
+	}
+
+	err = event.CancelRegistration(userId)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "OK"})
 }

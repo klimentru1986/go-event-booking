@@ -53,9 +53,8 @@ func (u *User) ValidateCredentials() error {
 	query := "SELECT id, password FROM users WHERE email = ?"
 	row := db.DB.QueryRow(query, u.Email)
 
-	var id int64
 	var hashedPassword string
-	err := row.Scan(&id, &hashedPassword)
+	err := row.Scan(&u.ID, &hashedPassword)
 	if err != nil {
 		return err
 	}
@@ -66,6 +65,5 @@ func (u *User) ValidateCredentials() error {
 		return errors.New("invalid password")
 	}
 
-	u.ID = id
 	return nil
 }
