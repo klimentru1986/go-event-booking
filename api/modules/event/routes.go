@@ -2,11 +2,11 @@ package event
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/klimentru1986/go-event-booking/common/models"
 	"github.com/klimentru1986/go-event-booking/middlewares"
+	"github.com/klimentru1986/go-event-booking/modules/event/services"
 )
 
 func SetupEventRoutes(group *gin.RouterGroup) {
@@ -35,7 +35,7 @@ func getEvents(ctx *gin.Context) {
 }
 
 func getEventByID(ctx *gin.Context) {
-	_, event, err := findEventByStrId(ctx.Param("id"))
+	_, event, err := services.FindEventByStrId(ctx.Param("id"))
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
@@ -70,7 +70,7 @@ func createEvent(ctx *gin.Context) {
 
 func updateEvent(ctx *gin.Context) {
 	userId := ctx.GetInt64("userId")
-	id, event, err := findEventByStrId(ctx.Param("id"))
+	id, event, err := services.FindEventByStrId(ctx.Param("id"))
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
@@ -105,7 +105,7 @@ func updateEvent(ctx *gin.Context) {
 
 func deleteEvent(ctx *gin.Context) {
 	userId := ctx.GetInt64("userId")
-	_, event, err := findEventByStrId(ctx.Param("id"))
+	_, event, err := services.FindEventByStrId(ctx.Param("id"))
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
@@ -127,25 +127,9 @@ func deleteEvent(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "Deleted"})
 }
 
-func findEventByStrId(strId string) (*int64, *models.Event, error) {
-	id, err := strconv.ParseInt(strId, 10, 64)
-
-	if err != nil {
-		return nil, nil, err
-	}
-
-	event, err := models.GetEventByID(id)
-
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return &id, event, nil
-}
-
 func registerForEvent(ctx *gin.Context) {
 	userId := ctx.GetInt64("userId")
-	_, event, err := findEventByStrId(ctx.Param("id"))
+	_, event, err := services.FindEventByStrId(ctx.Param("id"))
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
@@ -164,7 +148,7 @@ func registerForEvent(ctx *gin.Context) {
 
 func cancelRegistration(ctx *gin.Context) {
 	userId := ctx.GetInt64("userId")
-	_, event, err := findEventByStrId(ctx.Param("id"))
+	_, event, err := services.FindEventByStrId(ctx.Param("id"))
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})

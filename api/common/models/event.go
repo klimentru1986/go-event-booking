@@ -15,6 +15,15 @@ type Event struct {
 	UserID      int64     `json:"user_id"`
 }
 
+func NewEvent(name string, description string, location string, dateTime time.Time) Event {
+	return Event{
+		Name:        name,
+		Description: description,
+		Location:    location,
+		DateTime:    dateTime,
+	}
+}
+
 func (e *Event) Create() error {
 	query := `
 		INSERT INTO events(name, description, location, dateTime, user_id)
