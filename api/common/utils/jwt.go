@@ -21,13 +21,7 @@ func GenerateToken(id int64, email string) (string, error) {
 }
 
 func ValidateToken(tokenString string) (int64, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		_, ok := token.Method.(*jwt.SigningMethodHMAC)
-		if !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		return []byte(secret), nil
-	})
+	token, err := getToken(tokenString)
 
 	if err != nil {
 		return -1, err
@@ -47,4 +41,15 @@ func ValidateToken(tokenString string) (int64, error) {
 	userId := int64(claims["userId"].(float64))
 
 	return userId, nil
+}
+
+func getToken(tokenString string) (*jwt.Token, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		_, ok := token.Method.(*jwt.SigningMethodHMAC)
+		if !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(secret), nil
+	})
+	return token, err
 }
