@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/klimentru1986/go-event-booking/models"
+	"github.com/klimentru1986/go-event-booking/common/models"
 )
 
 func getEvents(ctx *gin.Context) {

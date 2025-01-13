@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/klimentru1986/go-event-booking/utils"
+	"github.com/klimentru1986/go-event-booking/common/utils"
 )
 
 func Authenticate(ctx *gin.Context) {

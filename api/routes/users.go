@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/klimentru1986/go-event-booking/dto"
-	"github.com/klimentru1986/go-event-booking/models"
-	"github.com/klimentru1986/go-event-booking/utils"
+	"github.com/klimentru1986/go-event-booking/common/dto"
+	"github.com/klimentru1986/go-event-booking/common/models"
+	"github.com/klimentru1986/go-event-booking/common/utils"
 )
 
 func signup(ctx *gin.Context) {
