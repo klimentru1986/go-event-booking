@@ -8,9 +8,9 @@ import (
 
 var DB *sql.DB
 
-func InitDB() {
+func InitDB(dbname string) {
 	var err error
-	DB, err = sql.Open("sqlite3", "common/db/api.db")
+	DB, err = sql.Open("sqlite3", dbname)
 
 	if err != nil {
 		panic("Could not connect to database.")

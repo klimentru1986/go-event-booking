@@ -48,6 +48,20 @@ func (u *User) Create() error {
 	u.ID = userId
 	return err
 }
+func (u *User) Delete() error {
+	query := "DELETE FROM users WHERE email = ?"
+
+	stmt, err := db.DB.Prepare(query)
+
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(u.Email)
+
+	return err
+}
 
 func (u *User) ValidateCredentials() error {
 	query := "SELECT id, password FROM users WHERE email = ?"

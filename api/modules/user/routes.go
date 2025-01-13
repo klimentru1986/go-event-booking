@@ -1,13 +1,18 @@
-package routes
+package user
 
 import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/klimentru1986/go-event-booking/common/dto"
-	"github.com/klimentru1986/go-event-booking/common/models"
-	"github.com/klimentru1986/go-event-booking/common/utils"
+	"github.com/klimentru1986/go-event-booking/modules/user/services"
 )
+
+func SetupUserRoutes(group *gin.RouterGroup) {
+
+	group.POST("/signup", signup)
+	group.POST("/login", login)
+}
 
 func signup(ctx *gin.Context) {
 	var userDto dto.CreateUserDto
@@ -18,9 +23,7 @@ func signup(ctx *gin.Context) {
 		return
 	}
 
-	user := models.NewUser(userDto.Email, userDto.Password)
-
-	err = user.Create()
+	user, err := services.Signup(&userDto)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err})
@@ -39,16 +42,7 @@ func login(ctx *gin.Context) {
 		return
 	}
 
-	user := models.NewUser(userDto.Email, userDto.Password)
-
-	err = user.ValidateCredentials()
-
-	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"message": err})
-		return
-	}
-
-	jwt, err := utils.GenerateToken(user.ID, user.Email)
+	jwt, err := services.Login(&userDto)
 
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"message": err})

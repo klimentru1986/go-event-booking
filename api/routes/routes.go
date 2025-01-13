@@ -5,11 +5,9 @@ import (
 	"github.com/klimentru1986/go-event-booking/middlewares"
 )
 
-func SetupRoutes(server *gin.Engine) {
+func SetupRoutes(group *gin.RouterGroup) {
 
-	v1 := server.Group("/api/v1")
-
-	auth := v1.Group("/")
+	auth := group.Group("/")
 	auth.Use(middlewares.Authenticate)
 	auth.POST("/events", createEvent)
 	auth.PUT("/events/:id", updateEvent)
@@ -17,9 +15,6 @@ func SetupRoutes(server *gin.Engine) {
 	auth.POST("/events/:id/registration", registerForEvent)
 	auth.DELETE("/events/:id/registration", cancelRegistration)
 
-	v1.GET("/events", getEvents)
-	v1.GET("/events/:id", getEventByID)
-
-	v1.POST("/signup", signup)
-	v1.POST("/login", login)
+	group.GET("/events", getEvents)
+	group.GET("/events/:id", getEventByID)
 }

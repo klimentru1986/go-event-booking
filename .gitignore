@@ -28,4 +28,4 @@ go.work.sum
 __debug*
 
 # local sqlite db
-api.db
+*.db
