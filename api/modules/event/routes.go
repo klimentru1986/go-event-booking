@@ -129,17 +129,10 @@ func deleteEvent(ctx *gin.Context) {
 
 func registerForEvent(ctx *gin.Context) {
 	userId := ctx.GetInt64("userId")
-	_, event, err := services.FindEventByStrId(ctx.Param("id"))
+	err := services.RegisterForEvent(ctx.Param("id"), userId)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
-		return
-	}
-
-	err = event.RegisterUser(userId)
-
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
 
@@ -148,17 +141,10 @@ func registerForEvent(ctx *gin.Context) {
 
 func cancelRegistration(ctx *gin.Context) {
 	userId := ctx.GetInt64("userId")
-	_, event, err := services.FindEventByStrId(ctx.Param("id"))
+	err := services.CancelRegistration(ctx.Param("id"), userId)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
-		return
-	}
-
-	err = event.CancelRegistration(userId)
-
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
 
