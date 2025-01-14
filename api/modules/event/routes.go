@@ -47,6 +47,7 @@ func getEventByID(ctx *gin.Context) {
 }
 
 func createEvent(ctx *gin.Context) {
+	userId := ctx.GetInt64("userId")
 	var event models.Event
 
 	err := ctx.ShouldBindJSON(&event)
@@ -56,9 +57,7 @@ func createEvent(ctx *gin.Context) {
 		return
 	}
 
-	event.UserID = ctx.GetInt64("userId")
-
-	err = event.Create()
+	err = services.CreateEvent(&event, userId)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
@@ -70,33 +69,19 @@ func createEvent(ctx *gin.Context) {
 
 func updateEvent(ctx *gin.Context) {
 	userId := ctx.GetInt64("userId")
-	id, event, err := services.FindEventByStrId(ctx.Param("id"))
-
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
-		return
-	}
-
-	if userId != event.UserID {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
-		return
-	}
-
 	var updatedEvent models.Event
 
-	err = ctx.ShouldBindJSON(&updatedEvent)
+	err := ctx.ShouldBindJSON(&updatedEvent)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
 		return
 	}
 
-	updatedEvent.ID = *id
-
-	err = updatedEvent.Update()
+	err = services.UpdateEvent(ctx.Param("id"), &updatedEvent, userId)
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
 		return
 	}
 
@@ -105,22 +90,10 @@ func updateEvent(ctx *gin.Context) {
 
 func deleteEvent(ctx *gin.Context) {
 	userId := ctx.GetInt64("userId")
-	_, event, err := services.FindEventByStrId(ctx.Param("id"))
+	err := services.DeleteEvent(ctx.Param("id"), userId)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
-		return
-	}
-
-	if userId != event.UserID {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
-		return
-	}
-
-	err = event.Delete()
-
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
 

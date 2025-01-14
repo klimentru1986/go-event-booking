@@ -65,3 +65,63 @@ func TestFindEventByStrId(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteEvent(t *testing.T) {
+	db.InitDB("../../../test.db")
+	u := models.NewUser("test@test.com", "testpass")
+	u.Create()
+
+	ev := models.NewEvent("test event", "test event description", "test location", time.Now().UTC())
+	ev.UserID = u.ID
+	ev.Create()
+
+	type args struct {
+		eventId string
+		userId  int64
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "delete event by id",
+			args: args{
+				eventId: strconv.FormatInt(ev.ID, 10),
+				userId:  ev.UserID,
+			},
+			wantErr: false,
+		},
+		{
+			name: "delete event by id with wrong user",
+			args: args{
+				eventId: strconv.FormatInt(ev.ID, 10),
+				userId:  0,
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := DeleteEvent(tt.args.eventId, tt.args.userId); (err != nil) != tt.wantErr {
+				t.Errorf("DeleteEvent() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestCreateEvent(t *testing.T) {
+	db.InitDB("../../../test.db")
+	u := models.NewUser("test@test.com", "testpass")
+	u.Create()
+
+	ev := models.NewEvent("test event", "test event description", "test location", time.Now().UTC())
+
+	t.Run("create event", func(t *testing.T) {
+		err := CreateEvent(&ev, u.ID)
+		if err != nil {
+			t.Errorf("CreateEvent() error = %v", err)
+		}
+	})
+
+}
