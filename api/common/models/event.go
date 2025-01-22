@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/klimentru1986/go-event-booking/common/db"
@@ -25,25 +26,15 @@ func NewEvent(name string, description string, location string, dateTime time.Ti
 }
 
 func (e *Event) Create() error {
-	query := `
-		INSERT INTO events(name, description, location, dateTime, user_id)
-		VALUES (?, ?, ?, ?, ?)
-	`
+	query := fmt.Sprintf(`INSERT INTO events(name, description, location, dateTime, user_id)
+		VALUES ('%s', '%s', '%s', '%s', '%x') RETURNING id`,
+		e.Name, e.Description, e.Location, e.DateTime.Format(time.RFC3339), e.UserID)
 
-	stmt, err := db.DB.Prepare(query)
-
+	var id int64
+	err := db.DB.QueryRow(query).Scan(&id)
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
-
-	result, err := stmt.Exec(e.Name, e.Description, e.Location, e.DateTime, e.UserID)
-
-	if err != nil {
-		return err
-	}
-
-	id, err := result.LastInsertId()
 
 	e.ID = id
 
@@ -53,8 +44,8 @@ func (e *Event) Create() error {
 func (e *Event) Update() error {
 	query := `
 		UPDATE events 
-		SET name = ?, description = ?, location = ?, dateTime = ?
-		WHERE id = ?
+		SET name = $1, description = $2, location = $3, dateTime = $4
+		WHERE id = $5
 	`
 
 	stmt, err := db.DB.Prepare(query)
@@ -74,7 +65,7 @@ func (e *Event) Update() error {
 }
 
 func (e *Event) Delete() error {
-	query := "DELETE FROM events WHERE id = ?"
+	query := "DELETE FROM events WHERE id = $1"
 
 	stmt, err := db.DB.Prepare(query)
 
@@ -91,7 +82,7 @@ func (e *Event) Delete() error {
 func (e *Event) RegisterUser(userId int64) error {
 	query := `
 		INSERT INTO registrations(user_id, event_id)
-		VALUES (?, ?)
+		VALUES ($1, $2)
 	`
 
 	stmt, err := db.DB.Prepare(query)
@@ -109,7 +100,7 @@ func (e *Event) RegisterUser(userId int64) error {
 func (e *Event) CancelRegistration(userId int64) error {
 	query := `
 	DELETE FROM registrations
-	WHERE user_id = ? AND event_id = ?
+	WHERE user_id = $1 AND event_id = $2
 	`
 	stmt, err := db.DB.Prepare(query)
 	if err != nil {
@@ -150,7 +141,7 @@ func GetAllEvents() ([]Event, error) {
 }
 
 func GetEventByID(id int64) (*Event, error) {
-	query := "SELECT * FROM events WHERE id = ?"
+	query := "SELECT * FROM events WHERE id = $1"
 	row := db.DB.QueryRow(query, id)
 
 	var e Event

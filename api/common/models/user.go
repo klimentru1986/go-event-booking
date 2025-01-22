@@ -30,7 +30,10 @@ func (u *User) Create() error {
 		return err
 	}
 
-	query := fmt.Sprintf("INSERT INTO users (email, password) VALUES ('%s' , '%s') RETURNING id", u.Email, hasedPassword)
+	query := fmt.Sprintf(`
+		INSERT INTO users (email, password) 
+		VALUES ('%s' , '%s') RETURNING id`,
+		u.Email, hasedPassword)
 
 	err = db.DB.QueryRow(query).Scan(&userId)
 
