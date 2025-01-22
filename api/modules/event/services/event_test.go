@@ -5,12 +5,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/klimentru1986/go-event-booking/common/config"
 	"github.com/klimentru1986/go-event-booking/common/db"
 	"github.com/klimentru1986/go-event-booking/common/models"
 )
 
+var conf_test = config.New("../../../test.env")
+
 func TestFindEventByStrId(t *testing.T) {
-	db.InitDB("sqlite3", "../../../test.db")
+	db.InitDB(conf_test.DbDriver, conf_test.DbSource)
 	ev := models.NewEvent(
 		"Event1",
 		"Descr1",
@@ -67,7 +70,7 @@ func TestFindEventByStrId(t *testing.T) {
 }
 
 func TestDeleteEvent(t *testing.T) {
-	db.InitDB("sqlite3", "../../../test.db")
+	db.InitDB(conf_test.DbDriver, conf_test.DbSource)
 	u := models.NewUser("test@test.com", "testpass")
 	u.Create()
 
@@ -111,7 +114,7 @@ func TestDeleteEvent(t *testing.T) {
 }
 
 func TestCreateEvent(t *testing.T) {
-	db.InitDB("sqlite3", "../../../test.db")
+	db.InitDB(conf_test.DbDriver, conf_test.DbSource)
 	u := models.NewUser("test@test.com", "testpass")
 	u.Create()
 

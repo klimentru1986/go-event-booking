@@ -4,10 +4,13 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/klimentru1986/go-event-booking/common/config"
 	"github.com/klimentru1986/go-event-booking/common/db"
 	"github.com/klimentru1986/go-event-booking/common/dto"
 	"github.com/klimentru1986/go-event-booking/common/models"
 )
+
+var conf_test = config.New("../../../test.env")
 
 func TestSignup(t *testing.T) {
 	testUserEmail := "testuser@test.com"
@@ -40,7 +43,7 @@ func TestSignup(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		db.InitDB("sqlite3", "../../../test.db")
+		db.InitDB(conf_test.DbDriver, conf_test.DbSource)
 		u := models.NewUser(tt.args.userDto.Email, tt.args.userDto.Password)
 		u.Delete()
 
@@ -95,7 +98,7 @@ func TestLogin(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		db.InitDB("sqlite3", "../../../test.db")
+		db.InitDB(conf_test.DbDriver, conf_test.DbSource)
 		u := models.NewUser(userDto.Email, userDto.Password)
 		u.Delete()
 		Signup(&userDto)
