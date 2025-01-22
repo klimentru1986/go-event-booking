@@ -40,7 +40,7 @@ func TestSignup(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		db.InitDB("../../../test.db")
+		db.InitDB("sqlite3", "../../../test.db")
 		u := models.NewUser(tt.args.userDto.Email, tt.args.userDto.Password)
 		u.Delete()
 
@@ -95,7 +95,7 @@ func TestLogin(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		db.InitDB("../../../test.db")
+		db.InitDB("sqlite3", "../../../test.db")
 		u := models.NewUser(userDto.Email, userDto.Password)
 		u.Delete()
 		Signup(&userDto)

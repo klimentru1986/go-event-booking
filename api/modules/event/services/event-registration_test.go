@@ -10,7 +10,7 @@ import (
 )
 
 func TestRegisterForEvent(t *testing.T) {
-	db.InitDB("../../../test.db")
+	db.InitDB("sqlite3", "../../../test.db")
 	u := models.NewUser("test@test.com", "testpass")
 	u.Create()
 
@@ -54,7 +54,7 @@ func TestRegisterForEvent(t *testing.T) {
 }
 
 func TestCancelRegistration(t *testing.T) {
-	db.InitDB("../../../test.db")
+	db.InitDB("sqlite3", "../../../test.db")
 	u := models.NewUser("test@test.com", "testpass")
 	u.Create()
 

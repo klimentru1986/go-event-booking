@@ -8,7 +8,8 @@ import (
 )
 
 func main() {
-	db.InitDB("common/db/api.db")
+	// db.InitDB("sqlite3", "common/db/api.db")
+	db.InitDB("postgres", "postgresql://goeventbooking:pass@localhost:5432/goeventbooking?sslmode=disable")
 	server := gin.Default()
 
 	v1 := server.Group("/api/v1")

@@ -10,7 +10,7 @@ import (
 )
 
 func TestFindEventByStrId(t *testing.T) {
-	db.InitDB("../../../test.db")
+	db.InitDB("sqlite3", "../../../test.db")
 	ev := models.NewEvent(
 		"Event1",
 		"Descr1",
@@ -67,7 +67,7 @@ func TestFindEventByStrId(t *testing.T) {
 }
 
 func TestDeleteEvent(t *testing.T) {
-	db.InitDB("../../../test.db")
+	db.InitDB("sqlite3", "../../../test.db")
 	u := models.NewUser("test@test.com", "testpass")
 	u.Create()
 
@@ -111,7 +111,7 @@ func TestDeleteEvent(t *testing.T) {
 }
 
 func TestCreateEvent(t *testing.T) {
-	db.InitDB("../../../test.db")
+	db.InitDB("sqlite3", "../../../test.db")
 	u := models.NewUser("test@test.com", "testpass")
 	u.Create()
 

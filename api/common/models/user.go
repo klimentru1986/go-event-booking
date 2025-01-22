@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/klimentru1986/go-event-booking/common/db"
 	"github.com/klimentru1986/go-event-booking/common/utils"
@@ -21,15 +22,7 @@ func NewUser(email string, password string) *User {
 }
 
 func (u *User) Create() error {
-	query := "INSERT INTO users (email, password) VALUES (?, ?)"
-
-	stmt, err := db.DB.Prepare(query)
-
-	if err != nil {
-		return err
-	}
-
-	defer stmt.Close()
+	var userId int64
 
 	hasedPassword, err := utils.HashPassword(u.Password)
 
@@ -37,19 +30,19 @@ func (u *User) Create() error {
 		return err
 	}
 
-	res, err := stmt.Exec(&u.Email, hasedPassword)
+	query := fmt.Sprintf("INSERT INTO users (email, password) VALUES ('%s' , '%s') RETURNING id", u.Email, hasedPassword)
+
+	err = db.DB.QueryRow(query).Scan(&userId)
 
 	if err != nil {
 		return err
 	}
 
-	userId, err := res.LastInsertId()
-
 	u.ID = userId
 	return err
 }
 func (u *User) Delete() error {
-	query := "DELETE FROM users WHERE email = ?"
+	query := "DELETE FROM users WHERE email = $1"
 
 	stmt, err := db.DB.Prepare(query)
 
@@ -64,7 +57,7 @@ func (u *User) Delete() error {
 }
 
 func (u *User) ValidateCredentials() error {
-	query := "SELECT id, password FROM users WHERE email = ?"
+	query := "SELECT id, password FROM users WHERE email = $1"
 	row := db.DB.QueryRow(query, u.Email)
 
 	var hashedPassword string
